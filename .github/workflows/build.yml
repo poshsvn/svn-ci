@@ -47,7 +47,7 @@ jobs:
 
       - name: gen-make
         run: |
-          $deps = C:\vcpkg\installed\x64-windows-release
+          $deps = "C:\vcpkg\installed\x64-windows-release"
           python ./svn/gen-make.py `
             -t vcpnet --vsnet-version=15.0 `
             --with-apr=$deps `
