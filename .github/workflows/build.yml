@@ -70,7 +70,7 @@ jobs:
         uses: microsoft/setup-msbuild@v2
 
       - name: Build
-        run: MSBuild.exe .\svn\subversion_vcnet.sln  /p:Platform=x64
+        run: MSBuild.exe .\svn\subversion_vcnet.sln  /p:Platform=x64 /v:minimal
 
       - name: Test
         working-directory: svn
