@@ -32,7 +32,18 @@ jobs:
         run: C:\vcpkg\vcpkg.exe install apr apr-util expat zlib --triplet x64-windows-release
 
       - name: Checkout
-        run: svn checkout ${{ inputs.url }} --revision ${{ inputs.revision }} svn
+        run: |
+          $url = "${{ inputs.url }}"
+          if ($url == "") {
+            $url = "https://svn.apache.org/repos/asf/subversion/trunk"
+          }
+
+          $revision = "${{ inputs.revision }}"
+          if ($revision == "") {
+            $revision = "HEAD"
+          }
+
+          svn checkout $url --revision $revision svn
 
       - name: gen-make
         run: |
