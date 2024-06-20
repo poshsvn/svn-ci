@@ -86,7 +86,4 @@ jobs:
         with:
           name: svn-Debug-x64
           path:
-            svn/Debug/**/*.log
-            svn/Debug/**/*.dll
-            svn/Debug/**/*.exe
-            svn/Debug/subversion/tests/**/*.*
+            svn/Debug/
