@@ -71,3 +71,7 @@ jobs:
 
       - name: Build
         run: MSBuild.exe .\svn\subversion_vcnet.sln  /p:Platform=x64
+
+      - name: Test
+        working-directory: svn
+        run: python ./win-tests.py --parallel
