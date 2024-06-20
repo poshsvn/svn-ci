@@ -67,7 +67,7 @@ jobs:
       - name: gen-make
         working-directory: svn
         run: |
-          $deps = "C:\vcpkg\installed\x64-windows-release"
+          $deps = "C:\vcpkg\installed\x64-svn-windows"
           python ./gen-make.py `
             -t vcproj --vsnet-version=2022 `
             --with-apr=$deps `
