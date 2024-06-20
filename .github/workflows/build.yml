@@ -39,7 +39,7 @@ jobs:
 
           Expand-Archive `
             -Path .\sqlite-amalgamation.zip `
-            -DestinationPath .\svn\sqlite-amalgamation
+            -DestinationPath .
 
       - name: Checkout
         run: |
@@ -63,7 +63,8 @@ jobs:
             -t vcproj --vsnet-version=2022 `
             --with-apr=$deps `
             --with-apr-util=$deps `
-            --with-zlib=$deps
+            --with-zlib=$deps `
+            --with-sqlite=./sqlite-amalgamation-3460000
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v2
