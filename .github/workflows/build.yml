@@ -70,4 +70,4 @@ jobs:
         uses: microsoft/setup-msbuild@v2
 
       - name: Build
-        run: MSBuild.exe .\subversion_vcnet.sln
+        run: MSBuild.exe .\svn\subversion_vcnet.sln
