@@ -52,7 +52,6 @@ jobs:
             -t vcpnet --vsnet-version=15.0 `
             --with-apr=$deps `
             --with-apr-util=$deps `
-            --with-xml=$deps `
             --with-zlib=$deps
 
       - name: Add msbuild to PATH
