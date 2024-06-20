@@ -51,7 +51,7 @@ jobs:
           python ./svn/gen-make.py `
             -t vcpnet --vsnet-version=15.0 `
             --with-apr=$deps `
-            --with-aprutil=$deps `
+            --with-apr-util=$deps `
             --with-expat=$deps `
             --with-zlib=$deps
 
