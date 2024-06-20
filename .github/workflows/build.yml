@@ -79,3 +79,14 @@ jobs:
       - name: Test
         working-directory: svn
         run: python ./win-tests.py --parallel
+     
+      - name: Upload artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: svn-Debug-x64
+          path:
+            svn/Debug/**/*.log
+            svn/Debug/**/*.dll
+            svn/Debug/**/*.exe
+            svn/Debug/subversion/tests/**/*.*
