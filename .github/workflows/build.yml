@@ -46,9 +46,10 @@ jobs:
           svn checkout $url --revision $revision svn
 
       - name: gen-make
+        working-directory: svn
         run: |
           $deps = "C:\vcpkg\installed\x64-windows-release"
-          python ./svn/gen-make.py `
+          python ./gen-make.py `
             -t vcpnet --vsnet-version=15.0 `
             --with-apr=$deps `
             --with-apr-util=$deps `
