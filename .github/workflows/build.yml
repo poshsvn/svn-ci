@@ -34,12 +34,12 @@ jobs:
       - name: Checkout
         run: |
           $url = "${{ inputs.url }}"
-          if ($url == "") {
+          if ($url -eq "") {
             $url = "https://svn.apache.org/repos/asf/subversion/trunk"
           }
 
           $revision = "${{ inputs.revision }}"
-          if ($revision == "") {
+          if ($revision -eq "") {
             $revision = "HEAD"
           }
 
