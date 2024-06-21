@@ -1,0 +1,986 @@
+Index: build/cmake/FindAPR.cmake
+===================================================================
+--- build/cmake/FindAPR.cmake	(nonexistent)
++++ build/cmake/FindAPR.cmake	(working copy)
+@@ -0,0 +1,59 @@
++find_path(APR_INCLUDE_DIR
++  NAMES apr.h
++  PATH_SUFFIXES
++    include
++    include/apr-1
++)
++
++find_library(APR_LIBRARY_SHARED
++  NAMES libapr-1
++  PATH_SUFFIXES lib
++)
++
++find_library(APR_LIBRARY_STATIC
++  NAMES apr-1
++  PATH_SUFFIXES lib
++)
++
++find_file(APR_DLL
++  NAMES libapr-1.dll
++  PATH_SUFFIXES bin
++)
++
++if(APR_LIBRARY_SHARED)
++  set(APR_LIBRARY ${APR_LIBRARY_SHARED})
++elseif(APR_LIBRARY_STATIC)
++  set(APR_LIBRARY ${APR_LIBRARY_STATIC})
++endif()
++
++FIND_PACKAGE_HANDLE_STANDARD_ARGS(
++  APR
++  REQUIRED_VARS
++    APR_LIBRARY
++    APR_INCLUDE_DIR
++)
++
++if(APR_FOUND)
++  if (NOT TARGET apr::apr)
++    if (APR_LIBRARY_SHARED)
++      add_library(apr::apr SHARED IMPORTED)
++      target_compile_definitions(apr::apr INTERFACE "APR_DECLARE_IMPORT")
++      set_target_properties(apr::apr PROPERTIES
++        INTERFACE_INCLUDE_DIRECTORIES ${APR_INCLUDE_DIR}
++        IMPORTED_LOCATION ${APR_DLL}
++        IMPORTED_IMPLIB ${APR_LIBRARY}
++      )
++    else()
++      add_library(apr::apr STATIC IMPORTED)
++      target_compile_definitions(apr::apr INTERFACE "APR_DECLARE_STATIC")
++      set_target_properties(apr::apr PROPERTIES
++        INTERFACE_INCLUDE_DIRECTORIES ${APR_INCLUDE_DIR}
++        IMPORTED_LOCATION ${APR_LIBRARY}
++      )
++    endif()
++
++    if (WIN32)
++      target_link_libraries(apr::apr INTERFACE ws2_32 rpcrt4)
++    endif()
++  endif()
++endif()
+Index: build/cmake/FindAPRUtil.cmake
+===================================================================
+--- build/cmake/FindAPRUtil.cmake	(nonexistent)
++++ build/cmake/FindAPRUtil.cmake	(working copy)
+@@ -0,0 +1,56 @@
++find_path(APRUTIL_INCLUDE_DIR
++  NAMES apu.h
++  PATHS ${CMAKE_PREFIX_PATH}
++  PATH_SUFFIXES
++    include
++    include/apr-1 # Not yet in apr
++)
++
++find_library(APRUTIL_LIBRARY_SHARED
++  NAMES libaprutil-1
++  PATH_SUFFIXES lib
++)
++
++find_library(APRUTIL_LIBRARY_STATIC
++  NAMES aprutil-1
++  PATH_SUFFIXES lib
++)
++
++find_file(APRUTIL_DLL
++  NAMES libaprutil-1.dll
++  PATH_SUFFIXES bin
++)
++
++if(APRUTIL_LIBRARY_SHARED)
++  set(APRUTIL_LIBRARY ${APRUTIL_LIBRARY_SHARED})
++elseif(APRUTIL_LIBRARY_STATIC)
++  set(APRUTIL_LIBRARY ${APRUTIL_LIBRARY_STATIC})
++endif()
++
++FIND_PACKAGE_HANDLE_STANDARD_ARGS(
++  APRUtil
++  REQUIRED_VARS
++    APRUTIL_LIBRARY
++    APRUTIL_INCLUDE_DIR
++)
++
++if(APRUtil_FOUND)
++  if(NOT TARGET apr::aprutil)
++    if (APRUTIL_LIBRARY_SHARED)
++      add_library(apr::aprutil SHARED IMPORTED)
++      target_compile_definitions(apr::aprutil INTERFACE "APU_DECLARE_IMPORT")
++      set_target_properties(apr::aprutil PROPERTIES
++        INTERFACE_INCLUDE_DIRECTORIES ${APRUTIL_INCLUDE_DIR}
++        IMPORTED_LOCATION ${APRUTIL_DLL}
++        IMPORTED_IMPLIB ${APRUTIL_LIBRARY}
++      )
++    else()
++      add_library(apr::aprutil STATIC IMPORTED)
++      target_compile_definitions(apr::aprutil INTERFACE "APU_DECLARE_STATIC")
++      set_target_properties(apr::aprutil PROPERTIES
++        INTERFACE_INCLUDE_DIRECTORIES ${APRUTIL_INCLUDE_DIR}
++        IMPORTED_LOCATION ${APRUTIL_LIBRARY}
++      )
++    endif()
++  endif()
++endif()
+Index: build/cmake/FindHTTPD.cmake
+===================================================================
+--- build/cmake/FindHTTPD.cmake	(nonexistent)
++++ build/cmake/FindHTTPD.cmake	(working copy)
+@@ -0,0 +1,63 @@
++find_path(HTTPD_INCLUDE_DIR
++  NAMES httpd.h
++  PATH_SUFFIXES
++    include
++)
++
++find_library(HTTPD_LIBRARY
++  NAMES libhttpd
++  PATH_SUFFIXES lib
++)
++
++find_file(HTTPD_DLL
++  NAMES libhttpd.dll
++  PATH_SUFFIXES bin
++)
++
++find_library(MOD_DAV_LIBRARY
++  NAMES mod_dav
++  PATH_SUFFIXES lib
++)
++
++FIND_PACKAGE_HANDLE_STANDARD_ARGS(
++  HTTPD
++  REQUIRED_VARS
++    HTTPD_LIBRARY
++    HTTPD_DLL
++    HTTPD_INCLUDE_DIR
++    MOD_DAV_LIBRARY
++)
++
++
++if(HTTPD_FOUND AND NOT TARGET httpd::httpd)
++  add_library(httpd::httpd SHARED IMPORTED)
++  set_target_properties(httpd::httpd PROPERTIES
++    INTERFACE_INCLUDE_DIRECTORIES ${HTTPD_INCLUDE_DIR}
++    IMPORTED_LOCATION ${HTTPD_DLL}
++    IMPORTED_IMPLIB ${HTTPD_LIBRARY}
++  )
++
++  add_library(httpd::mod_dav STATIC IMPORTED)
++  set_target_properties(httpd::mod_dav PROPERTIES
++    # TODO: allow different mod_dav include dir?
++    INTERFACE_INCLUDE_DIRECTORIES ${HTTPD_INCLUDE_DIR}
++    IMPORTED_LOCATION ${MOD_DAV_LIBRARY}
++  )
++
++  find_package(APR REQUIRED)
++  find_package(APRUtil REQUIRED)
++
++  target_link_libraries(httpd::httpd INTERFACE
++    apr::apr
++    apr::aprutil
++  )
++
++  target_link_libraries(httpd::mod_dav INTERFACE
++    apr::apr
++    apr::aprutil
++    httpd::httpd
++  )
++
++  # TODO: all dependecies
++endif()
++
+Index: build/cmake/FindSERF.cmake
+===================================================================
+--- build/cmake/FindSERF.cmake	(nonexistent)
++++ build/cmake/FindSERF.cmake	(working copy)
+@@ -0,0 +1,48 @@
++find_path(SERF_INCLUDE_DIR
++  NAMES serf.h
++  PATH_SUFFIXES
++    include
++    include/serf-1
++)
++
++find_library(SERF_LIBRARY
++  NAMES serf-1
++  PATH_SUFFIXES lib
++)
++
++FIND_PACKAGE_HANDLE_STANDARD_ARGS(
++  SERF
++  REQUIRED_VARS
++    SERF_LIBRARY
++    SERF_INCLUDE_DIR
++)
++
++add_library(SERF::SERF STATIC IMPORTED)
++
++set_target_properties(SERF::SERF PROPERTIES
++  INTERFACE_INCLUDE_DIRECTORIES ${SERF_INCLUDE_DIR}
++  IMPORTED_LOCATION ${SERF_LIBRARY}
++  # TODO: Link with SERF dependencies
++)
++
++find_package(OpenSSL REQUIRED)
++find_package(APR REQUIRED)
++find_package(APRUtil REQUIRED)
++find_package(ZLIB REQUIRED)
++
++target_link_libraries(SERF::SERF INTERFACE
++  apr::apr
++  apr::aprutil
++  OpenSSL::SSL
++  ZLIB::ZLIB
++)
++
++if (WIN32)
++  target_link_libraries(SERF::SERF INTERFACE
++    crypt32.lib
++    rpcrt4.lib
++    mswsock.lib
++    secur32.lib
++    ws2_32.lib
++  )
++endif()
+Index: build/cmake/dependencies.cmake
+===================================================================
+--- build/cmake/dependencies.cmake	(nonexistent)
++++ build/cmake/dependencies.cmake	(working copy)
+@@ -0,0 +1,97 @@
++# Setup modules path
++
++list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/build/cmake")
++
++### APR
++
++find_package(APR REQUIRED)
++add_library(external-apr ALIAS apr::apr)
++
++### APR-Util
++
++find_package(APRUtil REQUIRED)
++add_library(external-aprutil ALIAS apr::aprutil)
++
++### ZLIB
++
++find_package(ZLIB)
++add_library(external-zlib ALIAS ZLIB::ZLIB)
++
++### EXPAT
++
++# 1. Looking for EXPAT package
++# 2. Try using built-in FindEXPAT CMake module.
++# 3. TODO: Import the target manually.
++find_package(expat CONFIG QUIET)
++
++if (expat_FOUND)
++  message("Found EXPAT package.")
++  add_library(external-xml ALIAS expat::expat)
++else()
++  message("EXPAT package not found. Using module.")
++  set(EXPAT_NAMES expat expatw xml)
++  find_package(EXPAT MODULE QUIET)
++
++  if (EXPAT_FOUND)
++    message("EXPAT found via module.")
++    add_library(external-xml ALIAS EXPAT::EXPAT)
++  else()
++    # TODO: this is probably `xml.lib` from prebuilt HTTPD, which is
++    # not supported by default FindEXPAT CMake module.
++    message(FATAL_ERROR "EXPAT module not found. Not done yet.")
++  endif()
++endif()
++
++### LZ4
++
++if(SVN_USE_INTERNAL_LZ4)
++  add_library(external-lz4 STATIC "build/win32/empty.c")
++  target_compile_definitions(external-lz4 PUBLIC "SVN_INTERNAL_LZ4")
++else()
++  find_package(lz4 CONFIG REQUIRED)
++  add_library(external-lz4 ALIAS lz4::lz4)
++endif()
++
++### UTF8PROC
++
++if(SVN_USE_INTERNAL_UTF8PROC)
++  add_library(external-utf8proc STATIC "build/win32/empty.c")
++  target_compile_definitions(external-utf8proc PUBLIC "SVN_INTERNAL_UTF8PROC")
++else()
++  # TODO:
++  # find_package(utf8proc CONFIG REQUIRED)
++  # add_library(external-utf8proc ALIAS utf8proc)
++endif()
++
++### SQLite3
++
++if(SVN_SQLITE_USE_AMALGAMATION)
++  add_library(external-sqlite STATIC "build/win32/empty.c")
++  find_path(SVN_SQLITE_AMALGAMATION_DIR
++    NAMES sqlite3.c
++    PATHS ${SVN_SQLITE_AMALGAMATION_ROOT}
++  )
++  target_include_directories(external-sqlite
++                             PUBLIC "${SVN_SQLITE_AMALGAMATION_DIR}")
++  target_compile_definitions(external-sqlite PUBLIC SVN_SQLITE_INLINE)
++else()
++  find_package(SQLite3 REQUIRED)
++  add_library(external-sqlite ALIAS SQLite::SQLite3)
++endif()
++
++### SERF
++
++# TODO: determine SVN_BUILD_RA_SERF based on SERF existing.
++
++if (SVN_BUILD_RA_SERF)
++  find_package(SERF)
++  add_library(external-serf ALIAS SERF::SERF)
++endif()
++
++### HTTPD
++
++if (SVN_BUILD_APACHE_MODS)
++  find_package(HTTPD)
++  add_library(external-libhttpd ALIAS httpd::httpd)
++  add_library(external-mod_dav ALIAS httpd::mod_dav)
++endif()
+Index: build/generator/gen_cmake.py
+===================================================================
+--- build/generator/gen_cmake.py	(nonexistent)
++++ build/generator/gen_cmake.py	(working copy)
+@@ -0,0 +1,251 @@
++import os
++from build.generator.gen_make import UnknownDependency
++import ezt
++import gen_base
++
++class _eztdata(object):
++  def __init__(self, **kw):
++    vars(self).update(kw)
++
++class cmake_target():
++  def __init__(self, name: str, type: str, deps: str, libs: str,
++               sources, msvc_libs, msvc_export,
++               msvc_objects, msvc_force_static,
++               enable_condition: str, group: str, build_type: str,
++               srcdir: str):
++    self.name = name
++    self.type = type
++    self.deps = deps
++    self.libs = libs
++    self.sources = sources
++    self.msvc_libs = msvc_libs
++    self.msvc_export = msvc_export
++    self.msvc_objects = msvc_objects
++    self.msvc_force_static = ezt.boolean(msvc_force_static)
++
++    self.has_msvc_libs = ezt.boolean(len(msvc_libs) > 0)
++    self.has_msvc_objects = ezt.boolean(len(msvc_objects) > 0)
++
++    self.enable_condition = enable_condition
++    self.group = group
++    self.build_type = build_type
++
++    self.srcdir = srcdir
++
++def get_target_type(target: gen_base.Target):
++  if isinstance(target, gen_base.TargetExe):
++    if target.install == "test" and target.testing != "skip":
++      return "test"
++    else:
++      return "exe"
++  if isinstance(target, gen_base.TargetSWIG):
++    return "swig"
++  if isinstance(target, gen_base.TargetSWIGProject):
++    return "swig-project"
++  if isinstance(target, gen_base.TargetSWIGLib):
++    return "swig-lib"
++  if isinstance(target, gen_base.TargetLib):
++    return "lib"
++  else:
++    return str(type(target))
++
++class Generator(gen_base.GeneratorBase):
++  _extension_map = {
++    ('exe', 'target'): '.exe',
++    ('exe', 'object'): '.obj',
++    ('lib', 'target'): '.dll',
++    ('lib', 'object'): '.obj',
++    ('pyd', 'target'): '.pyd',
++    ('pyd', 'object'): '.obj',
++    ('so', 'target'): '.so',
++    ('so', 'object'): '.obj',
++  }
++
++  def __init__(self, fname, verfname, options=None):
++    gen_base.GeneratorBase.__init__(self, fname, verfname, options)
++
++  def write(self):
++    install_deps = self.graph.get_deps(gen_base.DT_INSTALL)
++
++    install_sources = self.get_install_sources()
++
++    # ensure consistency between runs
++    install_deps.sort()
++
++    targets = []
++
++    for target_ob in install_sources:
++      target_ob: gen_base.Target
++
++      if isinstance(target_ob, gen_base.TargetScript):
++        # there is nothing to build
++        continue
++
++      sources = []
++      deps = []
++      libs = []
++
++      enable_condition = "TRUE"
++      group = "SVN_LIBRARIES"
++      build_type = ""
++      msvc_force_static = False
++      srcdir = ""
++
++      # name of the module: strip 'libsvn_' and upper-case it
++      module_name = target_ob.name[7:].upper()
++
++      if isinstance(target_ob, gen_base.TargetExe):
++        if target_ob.install == "test" or target_ob.install == "sub-test":
++          enable_condition = "SVN_BUILD_TEST";
++          srcdir = target_ob.path
++        elif target_ob.install == "tools":
++          enable_condition = "SVN_BUILD_TOOLS";
++        else:
++          enable_condition = "SVN_BUILD_PROGRAMS";
++
++        if target_ob.msvc_force_static:
++          enable_condition += " AND NOT BUILD_SHARED_LIBS"
++          msvc_force_static = True
++      elif isinstance(target_ob, gen_base.TargetRaModule):
++        enable_condition = "SVN_BUILD_" + module_name;
++        group = "SVN_RA_MODULES"
++        build_type = " ${SVN_RA_BUILD_TYPE}"
++      elif isinstance(target_ob, gen_base.TargetFsModule):
++        enable_condition = "SVN_BUILD_" + module_name;
++        group = "SVN_FS_MODULES"
++        build_type = " ${SVN_FS_BUILD_TYPE}"
++      elif isinstance(target_ob, gen_base.TargetApacheMod):
++        enable_condition = "SVN_BUILD_APACHE_MODS";
++        build_type = " SHARED"
++      elif isinstance(target_ob, gen_base.TargetLib):
++        if target_ob.msvc_static:
++          build_type = " STATIC"
++
++      for link_dep in self.get_dependecies(target_ob.name):
++        if isinstance(link_dep, gen_base.TargetJava):
++          deps.append(link_dep.name)
++        elif isinstance(link_dep, gen_base.TargetLinked):
++          if link_dep.external_lib:
++            name = link_dep.name
++            if name == "ra-libs":
++              libs.append("${SVN_RA_MODULES}")
++            elif name == "fs-libs":
++              libs.append("${SVN_FS_MODULES}")
++            elif name in ["apriconv",
++                          "apr_memcache",
++                          "magic",
++                          "intl",
++                          "macos-plist",
++                          "macos-keychain",
++                          "sasl"]:
++              pass
++            else:
++              libs.append("external-" + name)
++          elif link_dep.external_project:
++            pass
++          else:
++            name: str = link_dep.name
++
++            if name in ["libsvn_ra_local", "libsvn_ra_serf", "libsvn_ra_svn",
++                        "libsvn_fs_base", "libsvn_fs_fs", "libsvn_fs_x"]:
++              # name of the module: strip 'libsvn_' and upper-case it
++              enable_condition += " AND SVN_BUILD_" + name[7:].upper()
++
++            libs.append(name)
++        elif isinstance(link_dep, gen_base.ObjectFile):
++          deps = self.graph.get_sources(gen_base.DT_OBJECT,
++                                        link_dep,
++                                        gen_base.SourceFile)
++          for dep in deps:
++            sources.append(dep.filename)
++        elif isinstance(link_dep, gen_base.HeaderFile):
++          pass
++        else:
++          raise UnknownDependency
++
++      target_type = get_target_type(target_ob)
++      target_name = target_ob.name
++      msvc_objects = []
++
++      if target_type in ["exe", "lib", "test", "tool"]:
++        msvc_libs = []
++        for lib in target_ob.msvc_libs:
++          if lib == "setargv.obj": # TODO: check for .obj
++            msvc_objects.append(lib)
++          else:
++            msvc_libs.append(lib)
++
++        msvc_export = []
++
++        if isinstance(target_ob, gen_base.TargetLib):
++          for export in target_ob.msvc_export:
++            path = "subversion/include/" + export.replace("\\", "/")
++            msvc_export.append(path)
++
++        target = cmake_target(target_name, target_type,
++                              deps, libs, sources,
++                              msvc_libs, msvc_export, msvc_objects,
++                              msvc_force_static, enable_condition, group,
++                              build_type, srcdir)
++
++        if group.endswith("_MODULES"):
++          targets.insert(0, target)
++        else:
++          targets.append(target)
++
++    sql_headers = []
++    for header in self.graph.get_all_sources(gen_base.DT_SQLHDR):
++      header: gen_base.TargetSQLHeader
++      sql_headers.append(str(header).replace("\\", "/"))
++
++    data = _eztdata(
++      targets = targets,
++      sql_headers = sql_headers
++    )
++
++    template = ezt.Template(os.path.join('build', 'generator', 'templates',
++                                         'CMakeLists.txt.ezt'),
++                            compress_whitespace=False)
++    template.generate(open('CMakeLists.txt', 'w'), data)
++
++  def get_install_sources(self):
++    install_sources = self.graph.get_all_sources(gen_base.DT_INSTALL)
++    result = []
++
++    for target in install_sources:
++      target: gen_base.Target
++
++      if not self.check_ignore_target(target):
++        result.append(target)
++
++    result.sort(key = lambda s: s.name)
++
++    return result
++
++  def get_dependecies(self, target_name):
++    deps = []
++
++    deps += self.graph.get_sources(gen_base.DT_LINK, target_name)
++    deps += self.graph.get_sources(gen_base.DT_NONLIB, target_name)
++
++    return deps
++
++  def check_ignore_target(self, target: gen_base.Target):
++    ignore_names = [
++      "libsvn_auth_gnome_keyring",
++      "libsvn_auth_kwallet",
++      "libsvnxx",
++      "svnxx-tests",
++      "__JAVAHL__",
++      "__JAVAHL_TESTS__",
++      "libsvnjavahl",
++    ]
++
++    for name in ignore_names:
++      if target.name == name:
++        return True
++
++      if isinstance(target, gen_base.TargetExe):
++        if target.install == "bdb-test":
++          return True
++
+
+Property changes on: build/generator/gen_cmake.py
+___________________________________________________________________
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Index: build/generator/templates/CMakeLists.txt.ezt
+===================================================================
+--- build/generator/templates/CMakeLists.txt.ezt	(nonexistent)
++++ build/generator/templates/CMakeLists.txt.ezt	(working copy)
+@@ -0,0 +1,212 @@
++cmake_minimum_required(VERSION 3.5)
++
++project("Subversion")
++
++set(CMAKE_PREFIX_PATH ${CMAKE_INSTALL_PREFIX} CACHE STRING
++  "Directory with installed dependecies"
++)
++
++option(SVN_BUILD_PROGRAMS "Build Subversion programs (such as svn.exe)" ON)
++option(SVN_BUILD_TOOLS "Build Subversion tools" OFF)
++option(SVN_BUILD_TEST "Build Subversion test-suite" OFF)
++
++# set(SVN_INSTALL_BIN_DIR "bin" CACHE STRING
++#   "Subversion binaries install directory."
++# )
++set(SVN_INSTALL_PROGRAMS_DIR "bin" CACHE STRING
++  "Subversion tools and programs install directory."
++)
++# set(SVN_INSTALL_LIB_DIR "lib" CACHE STRING
++#   "Subversion libraries install directory."
++# )
++set(SVN_INSTALL_INCLUDE_DIR "include/subversion-1" CACHE STRING
++  "Subversion include install directory."
++)
++
++option(SVN_SQLITE_USE_AMALGAMATION "Use sqlite amalgamation" ON)
++set(SVN_SQLITE_AMALGAMATION_ROOT "${CMAKE_SOURCE_DIR}/sqlite-amalgamation"
++    CACHE STRING "Directory with sqlite amalgamation"
++)
++option(SVN_USE_INTERNAL_UTF8PROC "Use internal version of utf8proc" ON)
++option(SVN_USE_INTERNAL_LZ4 "Use internal version of lz4" ON)
++
++option(SVN_BUILD_RA_LOCAL "Build Subversion Local Repository Access Library" ON)
++option(SVN_BUILD_RA_SERF "Build Subversion HTTP/WebDAV Protocol Repository Access Library" OFF)
++option(SVN_BUILD_RA_SVN "Build Subversion SVN Protocol Repository Access Library" ON)
++
++option(SVN_BUILD_FS_FS "Build Subversion FSFS Repository Filesystem Library" ON)
++option(SVN_BUILD_FS_X "Build Subversion FSX Repository Filesystem Library" ON)
++
++option(SVN_BUILD_APACHE_MODS "Build Subversion plug-in for the Apache DAV module" OFF)
++
++option(SVN_USE_DSO "Use DSO for FS and RA modules" ON)
++set(SVN_DSO_SUFFIX_FMT "%%d-${CMAKE_SHARED_LIBRARY_SUFFIX}" CACHE STRING "qq")
++set(SVN_SOVERSION "1" CACHE STRING "DSO version to load")
++
++option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
++option(SVN_BUILD_SHARED_FS "Build shared FS modules" ${BUILD_SHARED_LIBS})
++option(SVN_BUILD_SHARED_RA "Build shared RA modules" OFF)
++
++if(SVN_BUILD_SHARED_RA)
++  message(FATAL_ERROR "SVN_BUILD_SHARED_RA not yet supported")
++endif()
++
++if(SVN_BUILD_SHARED_FS)
++  set(SVN_FS_BUILD_TYPE SHARED)
++else()
++  set(SVN_FS_BUILD_TYPE STATIC)
++endif()
++
++if(SVN_BUILD_SHARED_RA)
++  set(SVN_RA_BUILD_TYPE SHARED)
++else()
++  set(SVN_RA_BUILD_TYPE STATIC)
++endif()
++
++# TODO: correctly detect system and platform
++string(TOLOWER "${CMAKE_HOST_SYSTEM_PROCESSOR}-${CMAKE_HOST_SYSTEM_NAME}" _default_build_host)
++set(SVN_BUILD_HOST ${_default_build_host} CACHE STRING "qq")
++
++string(TOLOWER "${CMAKE_SYSTEM_PROCESSOR}-${CMAKE_SYSTEM_NAME}" _default_build_target)
++set(SVN_BUILD_TARGET ${_default_build_target} CACHE STRING "qq")
++
++find_package(Python COMPONENTS Interpreter REQUIRED)
++
++configure_file(
++  "${CMAKE_CURRENT_SOURCE_DIR}/subversion/svn_private_config.hc"
++  "${CMAKE_CURRENT_BINARY_DIR}/svn_private_config.h"
++)
++
++set(SVN_INCLUDE_DIRECTORIES
++  "${CMAKE_CURRENT_SOURCE_DIR}/subversion/include"
++  "${CMAKE_CURRENT_BINARY_DIR}"
++)
++
++if (WIN32)
++  add_compile_definitions(
++    "alloca=_alloca"
++  )
++endif()
++
++if (SVN_BUILD_RA_LOCAL)
++  add_compile_definitions("SVN_LIBSVN_RA_LINKS_RA_LOCAL")
++endif()
++if (SVN_BUILD_RA_SERF)
++  add_compile_definitions("SVN_LIBSVN_RA_LINKS_RA_SERF")
++endif()
++if (SVN_BUILD_RA_SVN)
++  add_compile_definitions("SVN_LIBSVN_RA_LINKS_RA_SVN")
++endif()
++if (SVN_BUILD_FS_FS)
++  add_compile_definitions("SVN_LIBSVN_FS_LINKS_FS_FS")
++endif()
++if (SVN_BUILD_FS_X)
++  add_compile_definitions("SVN_LIBSVN_FS_LINKS_FS_X")
++endif()
++if (SVN_USE_DSO)
++  add_compile_definitions("SVN_USE_DSO")
++  add_compile_definitions("SVN_DSO_SUFFIX_FMT=\"${SVN_DSO_SUFFIX_FMT}\"")
++  add_compile_definitions("SVN_SOVERSION=${SVN_SOVERSION}")
++endif()
++
++include(build/cmake/dependencies.cmake)
++
++install(DIRECTORY "subversion/include/" DESTINATION ${SVN_INSTALL_INCLUDE_DIR})
++
++set(SVN_RA_MODULES)
++set(SVN_FS_MODULES)
++[for targets][is targets.type "exe"]
++if ([targets.enable_condition])
++  add_executable([targets.name][for targets.sources]
++    [targets.sources][end]
++  )
++  target_sources([targets.name] PRIVATE "build/win32/svn.rc")
++  add_dependencies([targets.name] copydeps)
++  install(TARGETS [targets.name] DESTINATION ${SVN_INSTALL_PROGRAMS_DIR})
++[end][is targets.type "lib"]
++if ([targets.enable_condition]) # TODO:
++  add_library([targets.name][targets.build_type][for targets.sources]
++    [targets.sources][end]
++  )
++  set_target_properties([targets.name] PROPERTIES OUTPUT_NAME "[targets.name]-1")
++  set([targets.name]_HEADERS[for targets.msvc_export]
++    "[targets.msvc_export]"[end]
++  )
++  add_custom_command(
++    WORKING_DIRECTORY
++      ${CMAKE_SOURCE_DIR}
++    COMMAND
++      ${Python_EXECUTABLE}
++    ARGS
++      "build/generator/extractor.py"
++      ${[targets.name]_HEADERS}
++      ">${CMAKE_BINARY_DIR}/[targets.name].def"
++    OUTPUT
++      "${CMAKE_BINARY_DIR}/[targets.name].def"
++    DEPENDS
++      "build/generator/extractor.py"
++      ${[targets.name]_HEADERS}
++  )
++  target_sources([targets.name] PRIVATE "${CMAKE_BINARY_DIR}/[targets.name].def")
++  target_include_directories([targets.name] PUBLIC ${SVN_INCLUDE_DIRECTORIES})
++  list(APPEND [targets.group] [targets.name])
++  install(TARGETS [targets.name])
++[end][is targets.type "test"]
++[if-any targets.msvc_force_static]if (SVN_BUILD_TEST AND BUILD_SHARED_LIBS)
++  message(WARNING "Ignoring test '[targets.name]', because it requires static"
++                  " libraries to build. Please disable BUILD_SHARED_LIBS"
++                  " option to build the test.")
++endif()
++[end]if([targets.enable_condition])
++  add_executable([targets.name][for targets.sources] [targets.sources][end])
++  add_test([targets.name] [targets.name] --srcdir ${CMAKE_SOURCE_DIR}/[targets.srcdir])
++[end]  target_link_libraries([targets.name] PRIVATE[for targets.libs]
++    [targets.libs][end]
++  )[if-any targets.has_msvc_libs targets.has_msvc_objects]
++  add_dependencies([targets.name] copydeps)
++  if(WIN32)
++[if-any targets.has_msvc_libs]    target_link_libraries([targets.name] PRIVATE[for targets.msvc_libs] [targets.msvc_libs][end])
++[end][if-any targets.has_msvc_objects]    set_target_properties([targets.name] PROPERTIES LINK_FLAGS[for targets.msvc_objects] [targets.msvc_objects][end])
++[end]  endif()[end]
++endif()
++[end]
++function(generate_sql_header SQL_PATH)
++  # get a filename without extension and directory name
++  get_filename_component(SQL_HEADER_PATH ${SQL_PATH} NAME_WE)
++
++  execute_process(
++    COMMAND
++      ${Python_EXECUTABLE}
++      "${CMAKE_SOURCE_DIR}/build/transform_sql.py"
++      "${SQL_PATH}" "${SQL_HEADER_PATH}.h"
++  )
++endfunction()
++
++[for sql_headers]generate_sql_header("${CMAKE_SOURCE_DIR}/[sql_headers]")
++[end]
++if(SVN_BUILD_TEST)
++  enable_testing()
++endif()
++
++add_library(copydeps "build/win32/empty.c")
++
++target_link_libraries(copydeps PRIVATE
++  external-apr
++  external-aprutil
++  external-lz4
++  external-sqlite
++  external-utf8proc
++  external-xml
++  external-zlib
++)
++
++if(SVN_BUILD_RA_SERF)
++  target_link_libraries(copydeps PRIVATE external-serf)
++endif()
++
++add_custom_command(TARGET copydeps POST_BUILD
++  COMMAND ${CMAKE_COMMAND} -E copy
++    $<TARGET_RUNTIME_DLLS:copydeps>
++    -t $<TARGET_FILE_DIR:copydeps>
++  COMMAND_EXPAND_LISTS
++)
+
+Property changes on: build/generator/templates/CMakeLists.txt.ezt
+___________________________________________________________________
+Added: svn:eol-style
+## -0,0 +1 ##
++LF
+\ No newline at end of property
+Index: gen-make.py
+===================================================================
+--- gen-make.py	(revision 1918334)
++++ gen-make.py	(working copy)
+@@ -49,6 +49,7 @@
+ gen_modules = {
+   'make' : ('gen_make', 'Makefiles for POSIX systems'),
+   'vcproj' : ('gen_vcnet_vcproj', 'VC.Net project files'),
++  'cmake' : ('gen_cmake', 'CMake build system'),
+   }
+ 
+ def main(fname, gentype, verfname=None,
+Index: subversion/svn_private_config.hc
+===================================================================
+--- subversion/svn_private_config.hc	(nonexistent)
++++ subversion/svn_private_config.hc	(working copy)
+@@ -0,0 +1,119 @@
++/*
++ * svn_private_config.hc : Template for svn_private_config.h for CMake.
++ *
++ * ====================================================================
++ *    Licensed to the Apache Software Foundation (ASF) under one
++ *    or more contributor license agreements.  See the NOTICE file
++ *    distributed with this work for additional information
++ *    regarding copyright ownership.  The ASF licenses this file
++ *    to you under the Apache License, Version 2.0 (the
++ *    "License"); you may not use this file except in compliance
++ *    with the License.  You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ *    Unless required by applicable law or agreed to in writing,
++ *    software distributed under the License is distributed on an
++ *    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
++ *    KIND, either express or implied.  See the License for the
++ *    specific language governing permissions and limitations
++ *    under the License.
++ * ====================================================================
++ */
++
++/* ==================================================================== */
++
++
++
++
++#ifndef SVN_PRIVATE_CONFIG_HW
++#define SVN_PRIVATE_CONFIG_HW
++
++
++/* Define to a Windows-specific equivalent of config.guess output */
++#define SVN_BUILD_HOST "@SVN_BUILD_HOST@"
++
++#define SVN_BUILD_TARGET "@SVN_BUILD_TARGET@"
++
++/* The minimal version of Berkeley DB we want */
++#define SVN_FS_WANT_DB_MAJOR    4
++#define SVN_FS_WANT_DB_MINOR    0
++#define SVN_FS_WANT_DB_PATCH    14
++
++/* Path separator for local filesystem */
++#define SVN_PATH_LOCAL_SEPARATOR '\\'
++
++/* Name of system's null device */
++#define SVN_NULL_DEVICE_NAME "nul"
++
++/* Defined to be the path to the installed binaries */
++#define SVN_BINDIR "/usr/local/bin"
++
++
++
++/* The default FS back-end type */
++#define DEFAULT_FS_TYPE "fsfs"
++
++/* The default HTTP library to use */
++#define DEFAULT_HTTP_LIBRARY "serf"
++
++/* Define to the Python/C API format character suitable for apr_int64_t */
++#if defined(_WIN64)
++#define SVN_APR_INT64_T_PYCFMT "l"
++#elif defined(_WIN32)
++#define SVN_APR_INT64_T_PYCFMT "L"
++#endif
++
++/* Setup gettext macros */
++#define N_(x) x
++#define U_(x) x
++#define PACKAGE_NAME "subversion"
++
++#ifdef ENABLE_NLS
++#define SVN_LOCALE_RELATIVE_PATH "../share/locale"
++#include <locale.h>
++#include <libintl.h>
++#define _(x) dgettext(PACKAGE_NAME, x)
++#define Q_(x1, x2, n) dngettext(PACKAGE_NAME, x1, x2, n)
++#define HAVE_BIND_TEXTDOMAIN_CODESET
++#else
++#define _(x) (x)
++#define Q_(x1, x2, n) (((n) == 1) ? x1 : x2)
++#define gettext(x) (x)
++#define dgettext(domain, x) (x)
++#endif
++
++/* compiler hints as supported by MS VC */
++#if defined(SVN_DEBUG)
++# define SVN__FORCE_INLINE
++# define SVN__PREVENT_INLINE
++#elif defined(_MSC_VER)
++# define SVN__FORCE_INLINE __forceinline
++# define SVN__PREVENT_INLINE __declspec(noinline)
++#else
++# define SVN__FORCE_INLINE APR_INLINE
++# define SVN__PREVENT_INLINE
++#endif
++
++#define SVN__PREDICT_TRUE(x)  (x)
++#define SVN__PREDICT_FALSE(x)  (x)
++
++/* Macro used to specify that a variable is intentionally left unused.
++   Supresses compiler warnings about the variable being unused.  */
++#define SVN_UNUSED(v) ( (void)(v) )
++
++#if defined(_MSC_VER) && _MSC_VER >= 1600
++#define HAVE_STDINT_H
++#endif
++
++#if defined(_MSC_VER) && _MSC_VER >= 1800
++#define HAVE_STDBOOL_H
++#endif
++
++#endif /* SVN_PRIVATE_CONFIG_HW */
++
++/* Inclusion of Berkeley DB header */
++#ifdef SVN_WANT_BDB
++#define APU_WANT_DB
++#include <apu_want.h>
++#endif
+Index: .
+===================================================================
+--- .	(revision 1918334)
++++ .	(working copy)
+
+Property changes on: .
+___________________________________________________________________
+Modified: svn:ignore
+## -65,3 +65,6 ##
+ .swig_pl_checked
+ .swig_py_checked
+ .swig_rb_checked
++out
++CMakeLists.txt
++CMakeSettings.json

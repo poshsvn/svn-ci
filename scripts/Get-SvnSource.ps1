@@ -12,3 +12,9 @@ if ($revision -eq "") {
 }
 
 svn checkout $url --revision $revision svn
+
+$patches = Get-ChildItem ./svn-ci/patches/*.patch
+
+$patches | ForEach-Object {
+    svn patch $_ ./svn
+}
