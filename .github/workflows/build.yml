@@ -176,7 +176,7 @@ jobs:
 
       - name: gen-make
         working-directory: svn
-        run: ./gen-make.py -t cmake
+        run: python ./gen-make.py -t cmake
 
       - name: Configure CMake
         working-directory: svn
