@@ -1,13 +1,11 @@
-param (
-    $Url,
-    $Revision
-)
+$url = $env:URL
+$revision = $env:REVISION
 
-if ($url -eq "") {
+if ($url -eq "" -or $null -eq $url) {
     $url = "https://svn.apache.org/repos/asf/subversion/trunk"
 }
 
-if ($revision -eq "") {
+if ($revision -eq "" -or $null -eq $revision) {
     $revision = "HEAD"
 }
 
