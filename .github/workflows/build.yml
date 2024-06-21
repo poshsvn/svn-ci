@@ -180,7 +180,10 @@ jobs:
 
       - name: Configure CMake
         working-directory: svn
-        run: cmake -B out -DCMAKE_PREFIX_PATH=C:\vcpkg\installed\x64-svn-windows
+        run: |
+          cmake -B out `
+            -DCMAKE_PREFIX_PATH=C:\vcpkg\installed\x64-svn-windows
+            -DSVN_SQLITE_AMALGAMATION_ROOT=../sqlite-amalgamation-3460000
 
       - name: Build CMake
         working-directory: svn
