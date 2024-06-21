@@ -75,7 +75,7 @@ jobs:
 
       - name: Build
         working-directory: ./svn
-        run: make
+        run: make -j
 
       - name: Test
         working-directory: ./svn
