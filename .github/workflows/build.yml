@@ -74,7 +74,7 @@ jobs:
       - name: configure
         working-directory: ./svn
         run: |
-          $deps = "/usr/local/share/vcpkg/installed/x64-linux"
+          $deps = "/usr/local/share/vcpkg/installed/x64-linux-release"
 
           ./configure `
             --with-apr=$deps `
