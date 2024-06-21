@@ -67,6 +67,23 @@ jobs:
             -Path .\sqlite-amalgamation.zip `
             -DestinationPath .
 
+      - name: autogen.sh
+        working-directory: ./svn
+        run: sh ./autogen.sh
+
+      - name: configure
+        working-directory: ./svn
+        run: |
+          ./configure `
+            --with-apr=$deps `
+            --with-apr-util=$deps `
+            --with-zlib=$deps `
+            --with-sqlite=../sqlite-amalgamation-3460000
+
+      - name: Build
+        working-directory: ./svn
+        run: make
+
   windows-vcnet:
     runs-on: windows-latest
 
