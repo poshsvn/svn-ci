@@ -53,19 +53,14 @@ jobs:
 
       - name: Install dependecies
         run: |
-          /usr/local/share/vcpkg/vcpkg `
-            install apr apr-util expat zlib `
-            --triplet x64-linux-release
-
-      - name: Download and extract sqlite amalgamation
-        run: |
-          Invoke-WebRequest `
-            -Uri https://sqlite.org/2024/sqlite-amalgamation-3460000.zip `
-            -OutFile sqlite-amalgamation.zip
-
-          Expand-Archive `
-            -Path .\sqlite-amalgamation.zip `
-            -DestinationPath .
+          sudo apt-get `
+            libtool `
+            libtool-bin `
+            libapr1-dev `
+            libaprutil1-dev `
+            libexpat1-dev `
+            zlib1g-dev `
+            libsqlite3-dev
 
       - name: autogen.sh
         working-directory: ./svn
@@ -73,16 +68,7 @@ jobs:
 
       - name: configure
         working-directory: ./svn
-        run: |
-          $deps = "/usr/local/share/vcpkg/installed/x64-linux-release"
-
-          ls $deps -r
-
-          ./configure `
-            --with-apr=$deps `
-            --with-apr-util=$deps `
-            --with-zlib=$deps `
-            --with-sqlite=../sqlite-amalgamation-3460000
+        run: ./configure
 
       - name: Build
         working-directory: ./svn
