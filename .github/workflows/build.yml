@@ -76,7 +76,7 @@ jobs:
         run: |
           $deps = "/usr/local/share/vcpkg/installed/x64-linux-release"
 
-          ls $deps -re
+          ls $deps -r
 
           ./configure `
             --with-apr=$deps `
