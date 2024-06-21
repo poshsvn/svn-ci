@@ -88,7 +88,4 @@ jobs:
       - name: Test
         working-directory: svn
         run: |
-          # setup vcruntime
-          $env:PATH = "C:\msys64\mingw64\bin;C:\msys64\usr\bin;" + $env:PATH
-
           python ./win-tests.py --parallel
