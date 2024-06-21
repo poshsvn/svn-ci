@@ -110,7 +110,7 @@ jobs:
         run: |
           $deps = "C:\vcpkg\installed\x64-svn-windows"
           python ./gen-make.py `
-            -t vcproj --vsnet-version=2022 `
+            -t vcproj --vsnet-version=2019 `
             --with-apr=$deps `
             --with-apr-util=$deps `
             --with-zlib=$deps `
