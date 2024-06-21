@@ -94,14 +94,7 @@ jobs:
             --triplet x64-svn-windows
 
       - name: Download and extract sqlite amalgamation
-        run: |
-          Invoke-WebRequest `
-            -Uri https://sqlite.org/2024/sqlite-amalgamation-3460000.zip `
-            -OutFile sqlite-amalgamation.zip
-
-          Expand-Archive `
-            -Path .\sqlite-amalgamation.zip `
-            -DestinationPath .
+        run: ./svn-ci/scripts/Get-SQLite.ps1
 
       - name: gen-make
         working-directory: svn
@@ -163,14 +156,7 @@ jobs:
             --triplet x64-svn-windows
 
       - name: Download and extract sqlite amalgamation
-        run: |
-          Invoke-WebRequest `
-            -Uri https://sqlite.org/2024/sqlite-amalgamation-3460000.zip `
-            -OutFile sqlite-amalgamation.zip
-
-          Expand-Archive `
-            -Path .\sqlite-amalgamation.zip `
-            -DestinationPath .
+        run: ./svn-ci/scripts/Get-SQLite.ps1
 
       - name: gen-make
         working-directory: svn
