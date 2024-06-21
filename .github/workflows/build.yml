@@ -77,6 +77,10 @@ jobs:
         working-directory: ./svn
         run: make
 
+      - name: Test
+        working-directory: ./svn
+        run: make check
+
   windows-vcnet:
     runs-on: windows-latest
 
