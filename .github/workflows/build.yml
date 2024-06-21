@@ -53,7 +53,7 @@ jobs:
 
       - name: Install dependecies
         run: |
-          sudo apt-get `
+          sudo apt-get install `
             libtool `
             libtool-bin `
             libapr1-dev `
