@@ -136,6 +136,9 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
+    env:
+      VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
+
     steps:
       - name: Checkout svn-ci
         uses: actions/checkout@v4
