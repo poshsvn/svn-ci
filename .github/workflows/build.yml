@@ -26,6 +26,20 @@ jobs:
         with:
           path: svn-ci
 
+      - name: Checkout
+        run: |
+          $url = "${{ inputs.url }}"
+          if ($url -eq "") {
+            $url = "https://svn.apache.org/repos/asf/subversion/trunk"
+          }
+
+          $revision = "${{ inputs.revision }}"
+          if ($revision -eq "") {
+            $revision = "HEAD"
+          }
+
+          svn checkout $url --revision $revision svn
+
       - name: Export GitHub Actions cache environment variables
         uses: actions/github-script@v7
         with:
@@ -49,20 +63,6 @@ jobs:
           Expand-Archive `
             -Path .\sqlite-amalgamation.zip `
             -DestinationPath .
-
-      - name: Checkout
-        run: |
-          $url = "${{ inputs.url }}"
-          if ($url -eq "") {
-            $url = "https://svn.apache.org/repos/asf/subversion/trunk"
-          }
-
-          $revision = "${{ inputs.revision }}"
-          if ($revision -eq "") {
-            $revision = "HEAD"
-          }
-
-          svn checkout $url --revision $revision svn
 
       - name: gen-make
         working-directory: svn
