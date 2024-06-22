@@ -168,9 +168,6 @@ jobs:
       - name: Download and extract sqlite amalgamation
         run: ./svn-ci/scripts/Get-SQLite.ps1
 
-      - name: Install ninja
-        run: choco install ninja
-
       - name: gen-make
         working-directory: svn
         run: python ./gen-make.py -t cmake
