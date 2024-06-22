@@ -200,6 +200,6 @@ jobs:
 
       - name: Build CMake
         run: |
-          ${{ github.workspace }}/svn-ci/scripts/Setup-VsDevShell.ps1
+          ${{ github.workspace }}/svn-ci/scripts/Setup-VsDevShell.ps1 -arch ${{ matrix.arch }}
 
           cmake --build ${{ github.workspace }}/svn/out
