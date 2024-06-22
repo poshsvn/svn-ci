@@ -181,7 +181,7 @@ jobs:
           CC: ${{ matrix.cc }}
           CXX: ${{ matrix.cxx }}
         run: |
-          C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd.bat
+          . "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\Tools\VsDevCmd".bat
           cmake -B out -G Ninja `
             -DCMAKE_PREFIX_PATH=C:\vcpkg\installed\${{ matrix.vcpkg_triplet }} `
             -DSVN_SQLITE_AMALGAMATION_ROOT=${{ github.workspace }}/sqlite-amalgamation-3460000 `
