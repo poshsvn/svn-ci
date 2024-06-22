@@ -1,0 +1,7 @@
+Index: hello_world.txt
+===================================================================
+--- hello_world.txt	(nonexistent)
++++ hello_world.txt	(working copy)
+@@ -0,0 +1,2 @@
++Hello, world!
++This is a sample patch for this actions project.
