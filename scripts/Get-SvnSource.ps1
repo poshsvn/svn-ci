@@ -9,6 +9,8 @@ if ($revision -eq "" -or $null -eq $revision) {
     $revision = "HEAD"
 }
 
+Write-Host "Checking out Subversion..."
+
 svn checkout $url --revision $revision svn --quiet
 
 $patches = Get-ChildItem ./svn-ci/patches/*.patch
