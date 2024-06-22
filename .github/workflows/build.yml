@@ -129,9 +129,13 @@ jobs:
           - os: windows-latest
             build_shared: ON
             vcpkg_triplet: x64-svn-windows
+            cc: cl
+            cxx: cl
           - os: windows-latest
             build_shared: OFF
             vcpkg_triplet: x64-svn-windows
+            cc: cl
+            cxx: cl
 
     runs-on: ${{ matrix.os }}
 
@@ -173,6 +177,9 @@ jobs:
 
       - name: Configure CMake
         working-directory: svn
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
         run: |
           cmake -B out -G Ninja `
             -DCMAKE_PREFIX_PATH=C:\vcpkg\installed\${{ matrix.vcpkg_triplet }} `
