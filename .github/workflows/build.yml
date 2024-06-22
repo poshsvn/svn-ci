@@ -129,11 +129,25 @@ jobs:
           - os: windows-latest
             build_shared: ON
             vcpkg_triplet: x64-svn-windows
+            arch: x64
             cc: cl
             cxx: cl
           - os: windows-latest
             build_shared: OFF
             vcpkg_triplet: x64-svn-windows
+            arch: x64
+            cc: cl
+            cxx: cl
+          - os: windows-latest
+            build_shared: ON
+            vcpkg_triplet: x86-svn-windows
+            arch: x86
+            cc: cl
+            cxx: cl
+          - os: windows-latest
+            build_shared: OFF
+            vcpkg_triplet: x86-svn-windows
+            arch: x86
             cc: cl
             cxx: cl
 
@@ -177,12 +191,13 @@ jobs:
           CC: ${{ matrix.cc }}
           CXX: ${{ matrix.cxx }}
         run: |
-          ${{ github.workspace }}/svn-ci/scripts/Setup-VsDevShell.ps1
+          ${{ github.workspace }}/svn-ci/scripts/Setup-VsDevShell.ps1 -arch ${{ matrix.arch }}
 
           cmake -S ${{ github.workspace }}/svn -B ${{ github.workspace }}/svn/out -G Ninja `
             -DCMAKE_PREFIX_PATH=C:\vcpkg\installed\${{ matrix.vcpkg_triplet }} `
             -DSVN_SQLITE_AMALGAMATION_ROOT=${{ github.workspace }}/sqlite-amalgamation-3460000 `
             -DBUILD_SHARED_LIBS=${{ matrix.build_shared }}
+            -DCMAKE_GENERATOR_PLATFORM=${{ matrix.arch }}
 
       - name: Build CMake
         run: |
