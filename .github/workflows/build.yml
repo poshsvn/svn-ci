@@ -185,6 +185,8 @@ jobs:
           Import-Module "$root\Common7\Tools\Microsoft.VisualStudio.DevShell.dll"
           Enter-VsDevShell -VsInstallPath $root -DevCmdArguments "-arch=x64 -host_arch=x64"
 
+          Set-Location ${{ github.workspace }}
+
           cmake -B out -G Ninja `
             -DCMAKE_PREFIX_PATH=C:\vcpkg\installed\${{ matrix.vcpkg_triplet }} `
             -DSVN_SQLITE_AMALGAMATION_ROOT=${{ github.workspace }}/sqlite-amalgamation-3460000 `
