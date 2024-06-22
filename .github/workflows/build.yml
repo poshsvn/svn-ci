@@ -128,9 +128,11 @@ jobs:
         include:
           - os: windows-latest
             build_shared: ON
+            vcpkg_triplet: x64-svn-windows
             environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
           - os: windows-latest
             build_shared: OFF
+            vcpkg_triplet: x64-svn-windows
             environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
 
     runs-on: ${{ matrix.os }}
@@ -159,7 +161,7 @@ jobs:
           C:\vcpkg\vcpkg.exe `
             install apr apr-util expat zlib `
             --overlay-triplets ./svn-ci/triplets `
-            --triplet x64-svn-windows
+            --triplet ${{ matrix.vcpkg_triplet }}
 
       - name: Download and extract sqlite amalgamation
         run: ./svn-ci/scripts/Get-SQLite.ps1
@@ -176,7 +178,7 @@ jobs:
           }
 
           cmake -B out `
-            -DCMAKE_PREFIX_PATH=C:\vcpkg\installed\x64-svn-windows `
+            -DCMAKE_PREFIX_PATH=C:\vcpkg\installed\${{ matrix.vcpkg_triplet }} `
             -DSVN_SQLITE_AMALGAMATION_ROOT=${{ github.workspace }}/sqlite-amalgamation-3460000 `
             -DBUILD_SHARED_LIBS=${{ matrix.build_shared }}
 
