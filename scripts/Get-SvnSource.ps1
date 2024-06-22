@@ -14,5 +14,7 @@ svn checkout $url --revision $revision svn
 $patches = Get-ChildItem ./svn-ci/patches/*.patch
 
 $patches | ForEach-Object {
+    $patchName = $_.Name
+    Write-Host "Appling patch '$patchName'..."
     svn patch $_ ./svn
 }
