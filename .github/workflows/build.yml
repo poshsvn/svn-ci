@@ -126,6 +126,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest]
+        build_shared: [ON, OFF]
 
     runs-on: ${{ matrix.os }}
 
@@ -168,6 +169,7 @@ jobs:
           cmake -B out `
             -DCMAKE_PREFIX_PATH=C:\vcpkg\installed\x64-svn-windows `
             -DSVN_SQLITE_AMALGAMATION_ROOT=${{ github.workspace }}/sqlite-amalgamation-3460000
+            -DBUILD_SHARED_LIBS=${{ matrix.build_shared }}
 
       - name: Build CMake
         working-directory: svn
