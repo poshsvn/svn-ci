@@ -1,4 +1,5 @@
 param(
+    [parameter(Mandatory)]
     $arch
 )
 
