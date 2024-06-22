@@ -196,7 +196,7 @@ jobs:
           cmake -S ${{ github.workspace }}/svn -B ${{ github.workspace }}/svn/out -G Ninja `
             -DCMAKE_PREFIX_PATH=C:\vcpkg\installed\${{ matrix.vcpkg_triplet }} `
             -DSVN_SQLITE_AMALGAMATION_ROOT=${{ github.workspace }}/sqlite-amalgamation-3460000 `
-            -DBUILD_SHARED_LIBS=${{ matrix.build_shared }}
+            -DBUILD_SHARED_LIBS=${{ matrix.build_shared }} `
             -DCMAKE_GENERATOR_PLATFORM=${{ matrix.arch }}
 
       - name: Build CMake
