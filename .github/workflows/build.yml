@@ -173,7 +173,6 @@ jobs:
         run: python ./gen-make.py -t cmake
 
       - name: Configure CMake
-        working-directory: svn
         env:
           CC: ${{ matrix.cc }}
           CXX: ${{ matrix.cxx }}
@@ -182,7 +181,7 @@ jobs:
           Import-Module "$root\Common7\Tools\Microsoft.VisualStudio.DevShell.dll"
           Enter-VsDevShell -VsInstallPath $root -DevCmdArguments "-arch=x64 -host_arch=x64"
 
-          Set-Location ${{ github.workspace }}
+          Set-Location ${{ github.workspace }}\svn
 
           cmake -B out -G Ninja `
             -DCMAKE_PREFIX_PATH=C:\vcpkg\installed\${{ matrix.vcpkg_triplet }} `
