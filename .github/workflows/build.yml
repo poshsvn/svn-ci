@@ -177,9 +177,7 @@ jobs:
           CC: ${{ matrix.cc }}
           CXX: ${{ matrix.cxx }}
         run: |
-          $root = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise"
-          Import-Module "$root\Common7\Tools\Microsoft.VisualStudio.DevShell.dll"
-          Enter-VsDevShell -VsInstallPath $root -DevCmdArguments "-arch=x64 -host_arch=x64"
+          ${{ github.workspace }}/svn-ci/scripts/Setup-VsDevShell.ps1
 
           cmake -S ${{ github.workspace }}/svn -B ${{ github.workspace }}/svn/out -G Ninja `
             -DCMAKE_PREFIX_PATH=C:\vcpkg\installed\${{ matrix.vcpkg_triplet }} `
@@ -188,8 +186,6 @@ jobs:
 
       - name: Build CMake
         run: |
-          $root = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise"
-          Import-Module "$root\Common7\Tools\Microsoft.VisualStudio.DevShell.dll"
-          Enter-VsDevShell -VsInstallPath $root -DevCmdArguments "-arch=x64 -host_arch=x64"
+          ${{ github.workspace }}/svn-ci/scripts/Setup-VsDevShell.ps1
 
           cmake --build ${{ github.workspace }}/svn/out
