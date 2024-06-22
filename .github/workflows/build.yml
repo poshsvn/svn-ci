@@ -125,8 +125,13 @@ jobs:
   cmake:
     strategy:
       matrix:
-        os: [windows-latest]
-        build_shared: [ON, OFF]
+        include:
+          - os: windows-latest
+            build_shared: ON
+            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
+          - os: windows-latest
+            build_shared: OFF
+            environment_script: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
 
     runs-on: ${{ matrix.os }}
 
@@ -166,6 +171,10 @@ jobs:
       - name: Configure CMake
         working-directory: svn
         run: |
+          if ("${{ matrix.environment_script }}" -ne "") {
+            & "${{ matrix.environment_script }}"
+          }
+
           cmake -B out `
             -DCMAKE_PREFIX_PATH=C:\vcpkg\installed\x64-svn-windows `
             -DSVN_SQLITE_AMALGAMATION_ROOT=${{ github.workspace }}/sqlite-amalgamation-3460000 `
