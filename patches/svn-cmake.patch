@@ -613,7 +613,7 @@ Index: build/generator/templates/CMakeLists.txt.ezt
 ===================================================================
 --- build/generator/templates/CMakeLists.txt.ezt	(nonexistent)
 +++ build/generator/templates/CMakeLists.txt.ezt	(working copy)
-@@ -0,0 +1,211 @@
+@@ -0,0 +1,215 @@
 +cmake_minimum_required(VERSION 3.5)
 +
 +project("Subversion")
@@ -721,6 +721,10 @@ Index: build/generator/templates/CMakeLists.txt.ezt
 +  add_compile_definitions("SVN_USE_DSO")
 +  add_compile_definitions("SVN_DSO_SUFFIX_FMT=\"${SVN_DSO_SUFFIX_FMT}\"")
 +  add_compile_definitions("SVN_SOVERSION=${SVN_SOVERSION}")
++endif()
++
++if (WIN32)
++  add_compile_definitions("WIN32")
 +endif()
 +
 +include(build/cmake/dependencies.cmake)
@@ -834,7 +838,7 @@ Added: svn:eol-style
 \ No newline at end of property
 Index: gen-make.py
 ===================================================================
---- gen-make.py	(revision 1918404)
+--- gen-make.py	(revision 1918334)
 +++ gen-make.py	(working copy)
 @@ -49,6 +49,7 @@
  gen_modules = {
@@ -970,22 +974,16 @@ Index: subversion/svn_private_config.hc
 +#endif
 Index: .
 ===================================================================
---- .	(revision 1918404)
+--- .	(revision 1918334)
 +++ .	(working copy)
 
 Property changes on: .
 ___________________________________________________________________
 Modified: svn:ignore
-## -62,6 +62,9 ##
- .kdev4
- *.kdev4
- .vs
--.swig_pl_checked
--.swig_py_checked
--.swig_rb_checked
-+.swig_pl_checked
-+.swig_py_checked
-+.swig_rb_checked
+## -65,3 +65,6 ##
+ .swig_pl_checked
+ .swig_py_checked
+ .swig_rb_checked
 +out
 +CMakeLists.txt
 +CMakeSettings.json
