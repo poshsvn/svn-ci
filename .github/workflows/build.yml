@@ -156,6 +156,12 @@ jobs:
             arch: x64
             cc: clang
             cxx: clang++
+          - os: windows-latest
+            build_shared: ON
+            vcpkg_triplet: x64-svn-windows
+            arch: x64
+            cc: gcc
+            cxx: g++
 
     runs-on: ${{ matrix.os }}
 
