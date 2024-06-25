@@ -14,7 +14,7 @@ on:
         description: Revision to checkout Subvesion from
 
 concurrency:
-  group: ${{ github.head_ref }}
+  group: ${{ github.ref }}
   cancel-in-progress: true
 
 env:
