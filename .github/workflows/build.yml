@@ -18,6 +18,22 @@ env:
   REVISION: ${{ inputs.revision }}
 
 jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout svn-ci
+        uses: actions/checkout@v4
+        with:
+          path: svn-ci
+
+      - name: Checkout Subversion
+        run: ./svn-ci/scripts/Get-SvnSource.ps1
+
+      - name: release.py
+        working-directory: svn
+        run: python tools/dist/release.py
+
   linux-make:
     runs-on: ubuntu-latest
 
