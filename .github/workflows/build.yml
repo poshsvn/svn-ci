@@ -13,6 +13,10 @@ on:
         type: string
         description: Revision to checkout Subvesion from
 
+concurrency:
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true
+
 env:
   URL: ${{ inputs.url }}
   REVISION: ${{ inputs.revision }}
