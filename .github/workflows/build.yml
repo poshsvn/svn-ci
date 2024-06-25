@@ -28,6 +28,7 @@ jobs:
           path: svn-ci
 
       - name: Checkout Subversion
+        shell: pwsh
         run: ./svn-ci/scripts/Get-SvnSource.ps1
 
       - name: release.py
