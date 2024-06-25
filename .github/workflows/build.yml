@@ -37,7 +37,7 @@ jobs:
 
       - name: release.py
         working-directory: svn
-        run: python tools/dist/release.py
+        run: python tools/dist/release.py build-env 1.2.3
 
   linux-make:
     runs-on: ubuntu-latest
