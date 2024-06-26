@@ -36,7 +36,11 @@ jobs:
         run: ./svn-ci/scripts/Get-SvnSource.ps1
 
       - name: Install tools
-        run: sudo apt-get install pax gettext m4 subversion
+        run: |
+          sudo apt-get install apache2 apache2-dev build-essential curl gettext `
+            iproute2 junit4 liblz4-dev libperl-dev libserf-dev libssl-dev `
+            libutf8proc-dev m4 openjdk-11-jdk-headless pax python python-dev `
+            python-pip python-yaml py3c-dev ruby ruby-dev swig subversion
 
       - name: release.py
         working-directory: svn
